@@ -22,6 +22,9 @@ class MainActivity : AppCompatActivity() {
             calendar.timeInMillis = System.currentTimeMillis()
             calendar.add(Calendar.SECOND, 5)
             setAlarmManager(calendar)
+            cancelAlarm.setOnClickListener{
+                cancelAlarmManager()
+            }
         }
     }
 
@@ -45,5 +48,11 @@ class MainActivity : AppCompatActivity() {
                         calendar.timeInMillis, pending)
             }
         }
+    }
+    private fun cancelAlarmManager(){
+        val am = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmBroadcastReceiver::class.java)
+        val pending = PendingIntent.getBroadcast(this,0,intent,0)
+        am.cancel(pending)
     }
 }
