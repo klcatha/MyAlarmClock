@@ -26,6 +26,7 @@ class SimpleAlertDialog : DialogFragment(){
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(activity).apply {
             setMessage("時間になりました")
