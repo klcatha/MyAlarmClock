@@ -15,6 +15,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (intent?.getBooleanExtra("onReceive", false) == true){
+            val dialog = SimpleAlertDialog()
+            dialog.show(fragmentManager, "alert_dialog")
+        }
         setContentView(R.layout.activity_main)
 
         setAlarm.setOnClickListener {
