@@ -1,18 +1,17 @@
 package com.example.kengomaruyama.myalarmclock
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.Dialog
-import android.app.DialogFragment
+import android.app.*
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.widget.DatePicker
+import android.widget.TimePicker
 import org.jetbrains.anko.toast
 import java.time.Month
 import java.time.Year
 import java.util.*
+import kotlin.math.min
 
 class SimpleAlertDialog : DialogFragment(){
     @RequiresApi(Build.VERSION_CODES.M)
@@ -75,4 +74,33 @@ class DatePickerFragment : DialogFragment(),
         listener.onSelected(year,month,date)
     }
 
+}
+
+class TimePickerFragment : DialogFragment(),
+        TimePickerDialog.OnTimeSetListener {
+
+    interface OnTimeSelectedLister {
+        fun onSelected(hourOfDay: Int, minute: Int)
+    }
+
+    private lateinit var listener: OnTimeSelectedLister
+
+    override fun onAttach(context: Context?){
+        super.onAttach(context)
+        if (context is TimePickerFragment.OnTimeSelectedLister){
+            listener = context
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val c = Calendar.getInstance()
+        val hour = c.get(Calendar.HOUR_OF_DAY)
+        val minute = c.get(Calendar.MINUTE)
+        return TimePickerDialog(context, this, hour, minute, true)
+    }
+
+    override fun onTimeSet(view: TimePicker, hourOfDay: Int, minute: Int) {
+        listener.onSelected(hourOfDay, minute)
+    }
 }
