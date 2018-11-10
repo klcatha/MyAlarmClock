@@ -8,11 +8,29 @@ import android.content.Intent
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PatternMatcher
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.toast
+import java.lang.IllegalArgumentException
+import java.text.DateFormat
+import java.text.ParseException
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity()
-    , SimpleAlertDialog.OnClickListener {
+    , SimpleAlertDialog.OnClickListener
+    , DatePickerFragment.OnDateSelectedListener
+    , TimePickerFragment.OnTimeSelectedLister{
+
+    override fun onSelected(year: Int, month: Int, date: Int){
+        val c = Calendar.getInstance()
+        c.set(year,month,date)
+        dateText.text = android.text.format.DateFormat.format("yyyy/MM/dd", c)
+    }
+
+    override fun onSelected(hourOfDay: Int, minute: Int){
+        timeText.text = "%1$02:%202d".format(hourOfDay, minute)
+    }
 
     override fun onPositiveClick() {
         finish()
@@ -33,16 +51,36 @@ class MainActivity : AppCompatActivity()
             val dialog = SimpleAlertDialog()
             dialog.show(fragmentManager, "alert_dialog")
         }
+
         setContentView(R.layout.activity_main)
 
         setAlarm.setOnClickListener {
-            val calendar = Calendar.getInstance()
-            calendar.timeInMillis = System.currentTimeMillis()
-            calendar.add(Calendar.SECOND, 5)
-            setAlarmManager(calendar)
-            cancelAlarm.setOnClickListener{
-                cancelAlarmManager()
+            val date = "${dateText.text} ${timeText.text}".toDate()
+            when{
+                date != null -> {
+                    val calendar = Calendar.getInstance()
+                    calendar.time = date
+                    setAlarmManager(calendar)
+                    toast("アラームをセットしました")
+                }
+                else ->{
+                    toast("日付の形式が正しくありません")
+                }
             }
+        }
+
+        cancelAlarm.setOnClickListener {
+            cancelAlarmManager()
+        }
+
+        dateText.setOnClickListener{
+            val dialog = DatePickerFragment()
+            dialog.show(fragmentManager, "date_dialog")
+        }
+
+        timeText.setOnClickListener{
+            val dialog = TimePickerFragment()
+            dialog.show(fragmentManager, "time_dialog")
         }
     }
 
@@ -72,5 +110,21 @@ class MainActivity : AppCompatActivity()
         val intent = Intent(this, AlarmBroadcastReceiver::class.java)
         val pending = PendingIntent.getBroadcast(this,0,intent,0)
         am.cancel(pending)
+    }
+
+    fun String.toDate(pattern: String = "yyyy/MM/dd HH:mm"): Date?{
+        val sdFormat = try {
+            SimpleDateFormat(pattern)
+        } catch (e: IllegalArgumentException){
+            null
+        }
+        val date = sdFormat?.let {
+            try{
+                it.parse(this)
+            } catch (e: ParseException) {
+                null
+            }
+        }
+        return date
     }
 }
