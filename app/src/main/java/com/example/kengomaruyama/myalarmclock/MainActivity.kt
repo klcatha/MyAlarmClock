@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun onSelected(hourOfDay: Int, minute: Int){
-        timeText.text = "%1$02:%202d".format(hourOfDay, minute)
+        timeText.text = "%1$02d:%2$02d".format(hourOfDay, minute)
     }
 
     override fun onPositiveClick() {
