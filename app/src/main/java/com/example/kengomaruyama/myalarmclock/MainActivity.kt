@@ -9,6 +9,7 @@ import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PatternMatcher
+import android.view.WindowManager.LayoutParams.*
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.toast
 import java.lang.IllegalArgumentException
@@ -17,6 +18,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity()
     , SimpleAlertDialog.OnClickListener
     , DatePickerFragment.OnDateSelectedListener
@@ -48,6 +50,14 @@ class MainActivity : AppCompatActivity()
         super.onCreate(savedInstanceState)
 
         if (intent?.getBooleanExtra("onReceive", false) == true){
+            when{
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ->
+                    window.addFlags(FLAG_TURN_SCREEN_ON or
+                    FLAG_SHOW_WHEN_LOCKED)
+                else ->
+                    window.addFlags(FLAG_TURN_SCREEN_ON or
+                    FLAG_SHOW_WHEN_LOCKED or FLAG_DISMISS_KEYGUARD)
+            }
             val dialog = SimpleAlertDialog()
             dialog.show(fragmentManager, "alert_dialog")
         }
